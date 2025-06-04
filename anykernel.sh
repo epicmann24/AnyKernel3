@@ -76,45 +76,259 @@ $MODPATH/bin/avbctl disable-verification --force
 lfdtget=$MODPATH/bin/fdtget
 lfdtput=$MODPATH/bin/fdtput
 
-PATCH_DTB() {
-    ui_print "Patching $1"
-    local lfinded=0
-    local alpatched=0
+PATCH3_VOOC_PPSPROTO=$MODPATH/patch/patch3_vooc_ppsproto
+PATCH4_COMMON=$MODPATH/patch/patch4_common
+PATCH4_BATT_THERM=$MODPATH/patch/patch4_batt_therm
+PATCH4_PPS=$MODPATH/patch/patch4_pps
+PATCH4_UFCS=$MODPATH/patch/patch4_ufcs
 
-    for i in $($lfdtget $1 /__fixups__ soc); do
-        local lpath=$(echo $i | sed 's/\:target\:0//g')
-        if $lfdtget -l $1 ${lpath}/__overlay__ | grep -q hmbird; then
-            if [ $($lfdtget $1 ${lpath}/__overlay__/oplus,hmbird/version_type type) == "HMBIRD_GKI" ]; then
-                alpatched=1
-                ui_print "$1 has been patched"
-            fi
+RMTHERM=$MODPATH/patch/remove_therm
+RMDDRC=$MODPATH/patch/remove_ddrc
+RMDSITIMMING=$MODPATH/patch/remove_dsi_timming
+
+patch_hm=1         # GKI (“hmbird”) patch
+patch_batt_therm=1 # loosen battery‐thermal limits
+patch_pps=1        # enable third‐party 55W PPS
+patch_ufcs=1       # enable UFCS mod
+rm_therm=1         # remove on-chip thermal controls
+rm_ddrc=1          # remove DDRC node(s)
+rm_dsi_timming=1   # remove DSI timing overrides
+
+find_prop_symbols() {
+    $lfdtget "$1" /__symbols__ "$2"
+}
+find_prop_symbols_head() {
+    $lfdtget "$1" /__symbols__ "$2" | sed -E 's#^(/fragment@[0-9]+).*#\1#'
+}
+find_prop_fixups_head() {
+    $lfdtget "$1" /__fixups__ "$2" | sed -E 's#^(/fragment@[0-9]+).*#\1#'
+}
+
+set3_prop() {
+    local mode="$1"
+    local dtbfile="$2"
+    local propname="$3"
+    local value="$4"
+    local nodepath
+    nodepath="$(find_prop_symbols "$dtbfile" "$propname")"
+    shift 4
+    "$lfdtput" -t "$mode" "$dtbfile" "$nodepath" "$value" "$@"
+    wait
+}
+
+set4_prop() {
+    local mode="$1"
+    local dtbfile="$2"
+    local propname="$3"
+    local subnode="$4"
+    local value="$5"
+    local nodepath
+    nodepath="$(find_prop_symbols "$dtbfile" "$propname")"
+    shift 5
+    "$lfdtput" -t "$mode" "$dtbfile" "$nodepath"/"$subnode" "$value" "$@"
+    wait
+}
+
+rmr_prop() {
+    local dtbfile="$1"
+    local flag="$2"
+    local propname="$3"
+    local child="$4"
+    local nodepath
+    nodepath="$(find_prop_symbols "$dtbfile" "$propname")"
+    "$lfdtput" -"${flag}" -v "$dtbfile" "$nodepath"/"$child"
+    wait
+}
+
+rmd_prop() {
+    local dtbfile="$1"
+    local flag="$2"
+    local propname="$3"
+    local todel="$4"
+    local nodepath
+    nodepath="$(find_prop_symbols "$dtbfile" "$propname")"
+    "$lfdtput" -"${flag}" -v "$dtbfile" "$nodepath" "$todel"
+    wait
+}
+
+fgrmr_prop() {
+    local dtbfile="$1"
+    local flag="$2"
+    local propname="$3"
+    local child="$4"
+    local nodepath
+    nodepath="$(find_prop_fixups_head "$dtbfile" "$propname")"
+    "$lfdtput" -"${flag}" -v "$dtbfile" "$nodepath"/"$child"
+    wait
+}
+
+fgfrmr_prop() {
+    local dtbfile="$1"
+    local flag="$2"
+    local propname="$3"
+    local child="$4"
+    local nodepath
+    nodepath="$(find_prop_fixups_head "$dtbfile" "$propname")"
+    "$lfdtput" -"${flag}" -v "$dtbfile" "$nodepath"/"$child"
+    wait
+}
+
+rm_proc_from_file() {
+    local filelist="$1"
+    local dtbfile="$2"
+    while IFS= read -r line; do
+        op="$(echo "$line" | awk '{print $1}')"
+        case "$op" in
+            r)
+                prop="$(echo "$line" | awk '{print $2}')"
+                child="$(echo "$line" | awk '{print $3}')"
+                rmr_prop "$dtbfile" "r" "$prop" "$child"
+                ;;
+            d)
+                prop="$(echo "$line" | awk '{print $2}')"
+                todel="$(echo "$line" | awk '{print $3}')"
+                rmd_prop "$dtbfile" "d" "$prop" "$todel"
+                ;;
+            fgr)
+                prop="$(echo "$line" | awk '{print $2}')"
+                child="$(echo "$line" | awk '{print $3}')"
+                fgrmr_prop "$dtbfile" "r" "$prop" "$child"
+                ;;
+            fgfr)
+                prop="$(echo "$line" | awk '{print $2}')"
+                child="$(echo "$line" | awk '{print $3}')"
+                fgfrmr_prop "$dtbfile" "r" "$prop" "$child"
+                ;;
+        esac
+    done <"$filelist"
+}
+
+namemark() {
+    local dtbfile="$1"
+    local tag="$2"
+    local modelstr
+    modelstr="$("$lfdtget" -t s "$dtbfile" / model | sed 's/jzmod_.*//g')"
+    datesuffix="$(date +%y-%m-%d_%H-%M-%S)"
+    "$lfdtput" -t s "$dtbfile" / model "${modelstr} jzmod_${tag}_${datesuffix}"
+    wait
+}
+
+PATCH_DTB() {
+    local dtbfile="$1"
+    ui_print "Patching $dtbfile"
+    local fg_count=0
+
+    # Find fragment index containing “shell” (for overlay removals):
+    for i in $(seq 1 60); do
+        if "$lfdtget" -l "$dtbfile" /fragment@"${i}"/__overlay__ 2>/dev/null | grep -q shell; then
+            fg_count="$i"
             break
         fi
     done
 
-    if [ $alpatched -eq 0 ]; then
-        for i in $($lfdtget $1 /__fixups__ soc); do
-            local lpath=$(echo $i | sed 's/\:target\:0//g')
-            if $lfdtget -l $1 ${lpath}/__overlay__ | grep -q hmbird; then
-                local lfinded=1
-                ui_print "- $1 Found DTBO patch location"
-                $lfdtput -t s $1 ${lpath}/__overlay__/oplus,hmbird/version_type type HMBIRD_GKI
+    if [ "$patch_hm" -eq 1 ]; then
+        for fix in $("$lfdtget" "$dtbfile" /__fixups__ soc); do
+            local path="$(echo "$fix" | sed 's/\:target\:0//g')"
+            if "$lfdtget" -l "$dtbfile" "${path}"/__overlay__ | grep -q hmbird; then
+                "$lfdtput" -r "$dtbfile" "${path}"/__overlay__/oplus,hmbird
                 break
             fi
         done
-
-        if [ $lfinded -eq 0 ]; then
-            ui_print "- Add patches for non GKI: $1"
-            for i in $($lfdtget $1 /__fixups__ soc); do
-                local ppath=$(echo $i | sed 's/\:target\:0//g')
-                if $lfdtget -l $1 ${ppath}/__overlay__ | grep -q reboot_reason; then
-                    $lfdtput -p -c $1 ${ppath}/__overlay__/oplus,hmbird/version_type
-                    $lfdtput -t s $1 ${ppath}/__overlay__/oplus,hmbird/version_type type HMBIRD_GKI
-                    break
-                fi
-            done
-        fi
+        "$lfdtput" -p -c "$dtbfile" /fragment@"${fg_count}"/__overlay__/oplus,hmbird/version_type
+        "$lfdtput" -t s "$dtbfile" /fragment@"${fg_count}"/__overlay__/oplus,hmbird/version_type type HMBIRD_GKI
     fi
+
+    while IFS= read -r line; do
+        set3_prop x "$dtbfile" $line
+    done <"$PATCH3_VOOC_PPSPROTO"
+
+    while IFS= read -r line; do
+        set4_prop x "$dtbfile" $line
+    done <"$PATCH4_COMMON"
+
+    if [ "$patch_batt_therm" -eq 1 ]; then
+        while IFS= read -r line; do
+            set4_prop x "$dtbfile" $line
+        done <"$PATCH4_BATT_THERM"
+    fi
+
+    if [ "$patch_pps" -eq 1 ]; then
+        while IFS= read -r line; do
+            set4_prop x "$dtbfile" $line
+        done <"$PATCH4_PPS"
+    fi
+
+    if [ "$patch_ufcs" -eq 1 ]; then
+        while IFS= read -r line; do
+            set4_prop x "$dtbfile" $line
+        done <"$PATCH4_UFCS"
+    fi
+
+    ui_print " → Removals for $dtbfile"
+    if [ "$rm_therm" -eq 1 ]; then
+        # Remove shell nodes:
+        "$lfdtput" -r "$dtbfile" /fragment@"${fg_count}"/__overlay__/shell_front
+        "$lfdtput" -r "$dtbfile" /fragment@"${fg_count}"/__overlay__/shell_frame
+        "$lfdtput" -r "$dtbfile" /fragment@"${fg_count}"/__overlay__/shell_back
+
+        rm_proc_from_file "$RMTHERM" "$dtbfile"
+
+        local fg_path
+        fg_path="$(find_prop_fixups_head "$dtbfile" modem_lte_dsc)"
+        for sub in \
+            socd/cooling-maps \
+            pmih010x-bcl-lvl0/cooling-maps \
+            pmih010x-bcl-lvl1/cooling-maps \
+            pmih010x-bcl-lvl2/cooling-maps \
+            pm8550-bcl-lvl0/cooling-maps \
+            pm8550-bcl-lvl1/cooling-maps \
+            pm8550-bcl-lvl2/cooling-maps \
+            pm8550vs_f_tz/cooling-maps \
+            pm8550ve_f_tz/cooling-maps \
+            pm8550vs_j_tz/cooling-maps \
+            pm8550ve_d_tz/cooling-maps \
+            pm8550ve_g_tz/cooling-maps \
+            pm8550ve_i_tz/cooling-maps \
+            sys-therm-0/cooling-maps/apc1_cdev \
+            sys-therm-0/cooling-maps/apc0_cdev \
+            sys-therm-0/cooling-maps/cdsp_cdev \
+            sys-therm-0/cooling-maps/gpu_cdev \
+            sys-therm-0/cooling-maps/lte_cdev \
+            sys-therm-0/cooling-maps/nr_cdev \
+            sys-therm-0/cooling-maps/display_cdev1 \
+            sys-therm-0/cooling-maps/display_cdev2 \
+            sys-therm-0/cooling-maps/display_cdev3 \
+            sys-therm-2/cooling-maps/gpu_dump_skip
+        do
+            "$lfdtput" -r "$dtbfile" /__local_fixups__/"${fg_path}"/__overlay__/"$sub"
+        done
+
+        for fx in \
+            APC1_MX_CX_PAUSE \
+            cdsp_sw \
+            msm_gpu \
+            modem_bcl \
+            APC0_MX_CX_PAUSE \
+            cdsp_sw_hvx \
+            modem_lte_dsc \
+            modem_nr_dsc \
+            cdsp_sw_hmx \
+            modem_nr_scg_dsc \
+            display_fps
+        do
+            "$lfdtput" -d "$dtbfile" /__fixups__ "$fx"
+        done
+    fi
+
+    if [ "$rm_ddrc" -eq 1 ]; then
+        rm_proc_from_file "$RMDDRC" "$dtbfile"
+    fi
+
+    if [ "$rm_dsi_timming" -eq 1 ]; then
+        rm_proc_from_file "$RMDSITIMMING" "$dtbfile"
+    fi
+
+    namemark "$dtbfile" "$(basename "$dtbfile")"
 }
 
 REPACKDTBO() {
@@ -125,16 +339,16 @@ REPACKDTBO() {
     ui_print ""
     LMKDT=$MODPATH/bin/mkdtimg
     ui_print "Unpacking DTBO"
-    $LMKDT dump $DTBOTMP -b dtb >/dev/null 2>&1
+    $LMKDT dump "$DTBOTMP" -b dtb >/dev/null 2>&1
     wait
 
     for i in dtb.*; do
-        PATCH_DTB $i &
+        PATCH_DTB "$i" &
     done
     wait
-    ui_print "Packaging DTBO"
 
-    $LMKDT create $DTBOTMP --page_size=4096 dtb.* >/dev/null 2>&1
+    ui_print "Packaging DTBO"
+    $LMKDT create "$DTBOTMP" --page_size=4096 dtb.* >/dev/null 2>&1
     wait
 }
 
@@ -146,15 +360,16 @@ DTBO_PARTI="/dev/block/bootdevice/by-name/dtbo$(getprop ro.boot.slot_suffix)"
 DTBOTMP="${TMPDIR}/dtbo.img"
 
 chmod +x $MODPATH/bin/*
-dd if=$DTBO_PARTI of=$DTBOTMP
+dd if="$DTBO_PARTI" of="$DTBOTMP"
 REPACKDTBO
 ui_print ""
 ui_print ""
 ui_print "Flashing DTBO"
-dd if=$DTBOTMP of=$DTBO_PARTI
+dd if="$DTBOTMP" of="$DTBO_PARTI"
 
 rm -r $MODPATH/bin
 rm -r $MODPATH/patch
+
 
 # ===END DTBO PATCH===
 
