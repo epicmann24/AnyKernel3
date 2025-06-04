@@ -64,11 +64,14 @@ touch /data/adb/post-fs-data.d/kernel-conf.sh
 chmod +x /data/adb/post-fs-data.d/kernel-conf.sh
 chmod +x /data/adb/service.d/kernel-conf.sh
 
+MODPATH=$(dirname "$(readlink -f "$0")")
+ui_print "Disabling AVB"
+$MODPATH/bin/avbctl disable-verity --force
+$MODPATH/bin/avbctl disable-verification --force
+
 # ===START DTBO PATCH===
 
 #Credits to bybycode
-
-MODPATH=$(dirname "$(readlink -f "$0")")
 
 lfdtget=$MODPATH/bin/fdtget
 lfdtput=$MODPATH/bin/fdtput
@@ -211,6 +214,7 @@ resetprop persist.sys.ostatsd.enable 0
 resetprop debug.sf.oplus_display_trace.enable 0
 resetprop net.core.default_qdisc fq
 resetprop net.ipv4.tcp_congestion_control bbr
+resetprop ro.boot.veritymode enforcing
 mount --bind /data/local/tmp/empty /system_ext/app/CrashBox
 mount --bind /data/local/tmp/empty /system_ext/app/EidService
 mount --bind /data/local/tmp/empty /system_ext/app/LogKit
