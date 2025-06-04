@@ -71,7 +71,7 @@ $MODPATH/bin/avbctl disable-verification --force
 
 # ===START DTBO PATCH===
 
-#Credits to bybycode
+# Credits to bybycode
 
 lfdtget=$MODPATH/bin/fdtget
 lfdtput=$MODPATH/bin/fdtput
@@ -218,7 +218,6 @@ PATCH_DTB() {
     ui_print "Patching $dtbfile"
     local fg_count=0
 
-    # Find fragment index containing “shell” (for overlay removals):
     for i in $(seq 1 60); do
         if "$lfdtget" -l "$dtbfile" /fragment@"${i}"/__overlay__ 2>/dev/null | grep -q shell; then
             fg_count="$i"
@@ -266,7 +265,6 @@ PATCH_DTB() {
 
     ui_print " → Removals for $dtbfile"
     if [ "$rm_therm" -eq 1 ]; then
-        # Remove shell nodes:
         "$lfdtput" -r "$dtbfile" /fragment@"${fg_count}"/__overlay__/shell_front
         "$lfdtput" -r "$dtbfile" /fragment@"${fg_count}"/__overlay__/shell_frame
         "$lfdtput" -r "$dtbfile" /fragment@"${fg_count}"/__overlay__/shell_back
@@ -338,7 +336,7 @@ REPACKDTBO() {
     ui_print ""
     ui_print ""
     LMKDT=$MODPATH/bin/mkdtimg
-    ui_print "Unpacking DTBO"
+    ui_print "Unpacking $DTBO_PARTI"
     $LMKDT dump "$DTBOTMP" -b dtb >/dev/null 2>&1
     wait
 
@@ -347,7 +345,7 @@ REPACKDTBO() {
     done
     wait
 
-    ui_print "Packaging DTBO"
+    ui_print "Packaging $DTBO_PARTI"
     $LMKDT create "$DTBOTMP" --page_size=4096 dtb.* >/dev/null 2>&1
     wait
 }
@@ -356,20 +354,26 @@ model=$(getprop ro.product.vendor.name)
 ui_print "Model code: $model"
 ui_print ""
 
-DTBO_PARTI="/dev/block/bootdevice/by-name/dtbo$(getprop ro.boot.slot_suffix)"
-DTBOTMP="${TMPDIR}/dtbo.img"
-
 chmod +x $MODPATH/bin/*
-dd if="$DTBO_PARTI" of="$DTBOTMP"
-REPACKDTBO
-ui_print ""
-ui_print ""
-ui_print "Flashing DTBO"
-dd if="$DTBOTMP" of="$DTBO_PARTI"
+
+for suffix in _a _b; do
+    PART="/dev/block/bootdevice/by-name/dtbo${suffix}"
+    if [ -e "$PART" ]; then
+        DTTMP="${TMPDIR}/dtbo${suffix}.img"
+        DTBO_PARTI="$PART"
+        DTBOTMP="$DTTMP"
+        ui_print "Processing $DTBO_PARTI..."
+        dd if="$DTBO_PARTI" of="$DTBOTMP"
+        REPACKDTBO
+        ui_print ""
+        ui_print ""
+        ui_print "Flashing $DTBO_PARTI"
+        dd if="$DTBOTMP" of="$DTBO_PARTI"
+    fi
+done
 
 rm -r $MODPATH/bin
 rm -r $MODPATH/patch
-
 
 # ===END DTBO PATCH===
 
@@ -451,4 +455,3 @@ mount --bind /data/local/tmp/empty /product/app/DeviceStatisticsService
 mount --bind /data/local/tmp/empty /system_ext/app/OwkService
 mount --bind /data/local/tmp/empty /my_stock/non_overlay/app/OBrain
 pfsd
-
