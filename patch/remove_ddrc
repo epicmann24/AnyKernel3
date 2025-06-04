@@ -1,0 +1,11 @@
+r oplus_mms_gauge silicon_p_770
+r oplus_mms_gauge ddrc_strategy
+r oplus_mms_gauge deep_spec,ddbc_curve
+d oplus_mms_gauge deep_spec,support
+d oplus_mms_gauge deep_spec,uv_thr
+d oplus_mms_gauge deep_spec,count_thr
+d oplus_mms_gauge deep_spec,vbat_soc
+d oplus_mms_gauge deep_spec,count_step
+d oplus_mms_gauge deep_spec,term_coeff
+d oplus_mms_gauge deep_spec,ddrc_strategy_name
+d oplus_mms_gauge deep_spec,volt_step

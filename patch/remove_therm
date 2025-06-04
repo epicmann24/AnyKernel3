@@ -1,0 +1,43 @@
+fgr r b_bcl_lvl0 pmih010x-bcl-lvl0/trips/thermal-engine-trip
+fgr r b_bcl_lvl0 pmih010x-bcl-lvl0/trips/thermal-hal-trip
+fgr r b_bcl_lvl0 pmih010x-bcl-lvl1/trips/thermal-engine-trip
+fgr r b_bcl_lvl0 pmih010x-bcl-lvl1/trips/thermal-hal-trip
+fgr r b_bcl_lvl0 pmih010x-bcl-lvl2/trips/thermal-engine-trip
+fgr r b_bcl_lvl0 pmih010x-bcl-lvl2/trips/thermal-hal-trip
+fgr r b_bcl_lvl0 socd/trips/thermal-engine-trip
+fgr r b_bcl_lvl0 socd/trips/thermal-hal-trip
+r pmk8550 vadc@9000/pm8550_skin_therm
+r pmk8550 vadc@9000/pmih010x_wls_therm
+r pmk8550 vadc@9000/pmih010x_chg_temp
+r pmk8550 vadc@9000/svooc_mos_btb_therm
+fgfr r modem_lte_dsc socd/cooling-maps/socd_apc1
+fgfr r modem_lte_dsc socd/cooling-maps/socd_cdsp1
+fgfr r modem_lte_dsc socd/cooling-maps/socd_gpu0
+fgfr r modem_lte_dsc pmih010x-bcl-lvl0/cooling-maps/lbat_modem0
+fgfr r modem_lte_dsc pmih010x-bcl-lvl0/cooling-maps/lbat_gpu0
+fgfr r modem_lte_dsc pmih010x-bcl-lvl1/cooling-maps/lbat_modem1
+fgfr r modem_lte_dsc pmih010x-bcl-lvl1/cooling-maps/lbat_gpu1
+fgfr r modem_lte_dsc pmih010x-bcl-lvl2/cooling-maps/lbat_gpu2
+fgfr r modem_lte_dsc pm8550-bcl-lvl0/cooling-maps/vph_modem0
+fgfr r modem_lte_dsc pm8550-bcl-lvl0/cooling-maps/vph_gpu0
+fgfr r modem_lte_dsc pm8550-bcl-lvl1/cooling-maps/vph_modem1
+fgfr r modem_lte_dsc pm8550-bcl-lvl1/cooling-maps/vph_gpu1
+fgfr r modem_lte_dsc pm8550-bcl-lvl2/cooling-maps/vph_gpu2
+fgfr r modem_lte_dsc pm8550vs_f_tz/cooling-maps/pm8550vs_f_apc1
+fgfr r modem_lte_dsc pm8550ve_f_tz/cooling-maps/pm8550ve_f_apc1
+fgfr r modem_lte_dsc pm8550vs_j_tz/cooling-maps/pm8550vs_j_apc0
+fgfr r modem_lte_dsc pm8550ve_d_tz/cooling-maps/pm8550ve_d_gpu
+fgfr r modem_lte_dsc pm8550ve_g_tz/cooling-maps/pm8550ve_g_hvx
+fgfr r modem_lte_dsc pm8550ve_g_tz/cooling-maps/pm8550ve_g_modem_lte
+fgfr r modem_lte_dsc pm8550ve_g_tz/cooling-maps/pm8550ve_g_modem_nr
+fgfr r modem_lte_dsc pm8550ve_i_tz/cooling-maps/pm8550ve_i_hmx
+fgfr r modem_lte_dsc sys-therm-0/cooling-maps/apc1_cdev
+fgfr r modem_lte_dsc sys-therm-0/cooling-maps/apc0_cdev
+fgfr r modem_lte_dsc sys-therm-0/cooling-maps/cdsp_cdev
+fgfr r modem_lte_dsc sys-therm-0/cooling-maps/gpu_cdev
+fgfr r modem_lte_dsc sys-therm-0/cooling-maps/lte_cdev
+fgfr r modem_lte_dsc sys-therm-0/cooling-maps/nr_cdev
+fgfr r modem_lte_dsc sys-therm-0/cooling-maps/display_cdev1
+fgfr r modem_lte_dsc sys-therm-0/cooling-maps/display_cdev2
+fgfr r modem_lte_dsc sys-therm-0/cooling-maps/display_cdev3
+fgfr r modem_lte_dsc sys-therm-2/cooling-maps/gpu_dump_skip
