@@ -434,6 +434,7 @@ resetprop debug.sf.oplus_display_trace.enable 0
 resetprop net.core.default_qdisc fq
 resetprop net.ipv4.tcp_congestion_control bbr
 resetprop ro.boot.veritymode enforcing
+
 mount --bind /data/local/tmp/empty /system_ext/app/CrashBox
 mount --bind /data/local/tmp/empty /system_ext/app/EidService
 mount --bind /data/local/tmp/empty /system_ext/app/LogKit
@@ -454,4 +455,7 @@ mount --bind /data/local/tmp/empty /system_ext/priv-app/xrvdservice
 mount --bind /data/local/tmp/empty /product/app/DeviceStatisticsService
 mount --bind /data/local/tmp/empty /system_ext/app/OwkService
 mount --bind /data/local/tmp/empty /my_stock/non_overlay/app/OBrain
+
+mount --bind /system/bin/logd /dev/null
+mount --bind /system/etc/init/logd.rc /dev/null
 pfsd
