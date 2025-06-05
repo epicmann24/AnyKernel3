@@ -431,6 +431,13 @@ resetprop persist.sys.ostats_tpd.enable 0
 resetprop persist.sys.ostats_pullerd.enable 0
 resetprop persist.sys.ostatsd.enable 0
 resetprop debug.sf.oplus_display_trace.enable 0
+resetprop persist.ims.disableADBLogs 1
+resetprop persist.ims.disableDebugLogs 1
+resetprop persist.ims.disablelMSLogs 1
+resetprop persist.ims.disableQXDMLogs 1
+resetprop persist.vendor.ims.disableADBLogs 1
+resetprop ro.oplus.minidump.kernel.log.support 0
+resetprop ro.oplus.radio.global_regionlock.log 0
 resetprop net.core.default_qdisc fq
 resetprop net.ipv4.tcp_congestion_control bbr
 resetprop ro.boot.veritymode enforcing
@@ -456,6 +463,4 @@ mount --bind /data/local/tmp/empty /product/app/DeviceStatisticsService
 mount --bind /data/local/tmp/empty /system_ext/app/OwkService
 mount --bind /data/local/tmp/empty /my_stock/non_overlay/app/OBrain
 
-mount --bind /system/bin/logd /dev/null
-mount --bind /system/etc/init/logd.rc /dev/null
 pfsd
