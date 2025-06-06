@@ -393,11 +393,14 @@ echo "0" > /sys/devices/system/cpu/pmu_lib/enable_counters
 echo "1888" > /sys/class/qcom-haptics/vmax
 echo "8300" > /sys/class/qcom-haptics/cl_vmax
 echo "11451" > /sys/class/qcom-haptics/fifo_vmax
+echo "0 0 0 0" > /proc/sys/kernel/printk
+mount --bind /dev/null /system/bin/logd
 stop statsd
 stop tombstoned
 stop criticallog
 stop traced
 stop traced_probes
+stop logd
 sd
 
 cat <<'pfsd'>> /data/adb/post-fs-data.d/kernel-conf.sh
