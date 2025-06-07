@@ -86,7 +86,6 @@ RMTHERM=$MODPATH/patch/remove_therm
 RMDDRC=$MODPATH/patch/remove_ddrc
 RMDSITIMMING=$MODPATH/patch/remove_dsi_timming
 
-patch_hm=1         # GKI (“hmbird”) patch
 patch_batt_therm=1 # loosen battery‐thermal limits
 patch_pps=1        # enable third‐party 55W PPS
 patch_ufcs=1       # enable UFCS mod
@@ -340,6 +339,21 @@ REPACKDTBO() {
     $LMKDT dump "$DTBOTMP" -b dtb >/dev/null 2>&1
     wait
 
+    count=$(for f in dtb.*; do
+            strings "$f" | grep -c "hmbird"
+            done | awk '{s+=$1} END{print s}')
+
+    if [ "$count" -ge 3 ]; then
+        patch_hm=0
+        ui_print "Your DTBO is already patched (found $count hmbird marks), skipping GKI patch."
+        ui_print "It is recomended to flash stock dtbo and boot before flashing kernel"
+        ui_print "If everything is working fine then dont worry, if there is issues thos dhould be your first troubleshooting step"
+        ui_print "Resuming flashing in 2 seconds"
+        sleep 2
+    else
+        patch_hm=1
+    fi
+
     for i in dtb.*; do
         PATCH_DTB "$i" &
     done
@@ -466,4 +480,4 @@ mount --bind /data/local/tmp/empty /product/app/DeviceStatisticsService
 mount --bind /data/local/tmp/empty /system_ext/app/OwkService
 mount --bind /data/local/tmp/empty /my_stock/non_overlay/app/OBrain
 
-pfsd
+psd
