@@ -345,18 +345,18 @@ REPACKDTBO() {
 
     if [ "$count" -ge 3 ]; then
         patch_hm=0
-        ui_print ""
-        ui_print ""
+        ui_print " "
+        ui_print " "
         ui_print "Your DTBO is already patched (found $count hmbird marks), skipping GKI patch."
-        ui_print ""
-        ui_print ""
+        ui_print " "
+        ui_print " "
         ui_print "It is recomended to flash stock dtbo and boot before flashing kernel"
         ui_print "If everything is working fine then dont worry, if there is issues then this should be your first troubleshooting step"
-        ui_print ""
-        ui_print ""
+        ui_print " "
+        ui_print " "
         ui_print "Resuming flashing in 3 seconds"
-        ui_print ""
-        ui_print ""
+        ui_print " "
+        ui_print " "
         sleep 3
     else
         patch_hm=1
