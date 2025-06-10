@@ -423,6 +423,16 @@ stop criticallog
 stop traced
 stop traced_probes
 stop logd
+
+echo "0 25000" >/proc/shell-temp
+echo "1 25000" >/proc/shell-temp
+echo "2 25000" >/proc/shell-temp
+echo 0 > /sys/class/oplus_chg/battery/cool_down
+echo 0 > /sys/class/oplus_chg/battery/normal_cool_down
+echo 9100 > /sys/class/oplus_chg/battery/bcc_current
+chmod 0444 /sys/class/oplus_chg/battery/bcc_current
+chmod 0444 /sys/class/oplus_chg/battery/normal_cool_down
+chmod 0444 /sys/class/oplus_chg/battery/cool_down
 sd
 
 cat <<'pfsd'>> /data/adb/post-fs-data.d/kernel-conf.sh
