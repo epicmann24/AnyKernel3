@@ -354,10 +354,9 @@ REPACKDTBO() {
         ui_print "If everything is working fine then dont worry, if there is issues then this should be your first troubleshooting step"
         ui_print " "
         ui_print " "
-        ui_print "Resuming flashing in 3 seconds"
+        ui_print "Resuming flashing"
         ui_print " "
         ui_print " "
-        sleep 3
     else
         patch_hm=1
     fi
