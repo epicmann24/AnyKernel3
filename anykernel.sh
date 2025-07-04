@@ -415,13 +415,12 @@ echo "1888" > /sys/class/qcom-haptics/vmax
 echo "8300" > /sys/class/qcom-haptics/cl_vmax
 echo "11451" > /sys/class/qcom-haptics/fifo_vmax
 echo "0 0 0 0" > /proc/sys/kernel/printk
-mount --bind /dev/null /system/bin/logd
 stop statsd
-stop tombstoned
 stop criticallog
 stop traced
 stop traced_probes
-stop logd
+kill -STOP $(pidof tombstoned)
+kill -STOP $(pidof logd)
 
 echo "0 25000" >/proc/shell-temp
 echo "1 25000" >/proc/shell-temp
