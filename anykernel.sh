@@ -469,6 +469,7 @@ resetprop persist.anr.dumpthr 0
 resetprop persist.sys.enable_adsp_dump 0
 resetprop persist.sys.enable_venus_dump 0
 resetprop persist.sys.oplus.wifi.fulldump.enable 0
+resetprop persist.vendor.service.bt.iotinfo.report.enable 0
 resetprop sys.wifitracing.started 0
 resetprop sys.trace.traced_started 0
 resetprop sys.oplus.wifi.dump.needupload 0
@@ -480,7 +481,10 @@ resetprop ro.logd.flowctrl.on 0
 resetprop ro.logd.flowctrl.method 0
 resetprop debug.oplus.video.log.enable 0
 resetprop debug.sf.oplus_display_trace.enable 0
+resetprop debug.c2.use_dmabufheaps 0
 resetprop vendor.swvdec.log.level 0
+resetprop dalvik.vm.dex2oat-minidebuginfo 0
+resetprop dalvik.vm.minidebuginfo 0
 
 resetprop ro.oplus.radio.global_regionlock.log 0
 resetprop net.core.default_qdisc fq
