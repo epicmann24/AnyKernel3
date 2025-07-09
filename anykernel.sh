@@ -440,6 +440,8 @@ rm -f /data/adb/service.d/kernel-conf.sh
 rm -f /data/adb/post-fs-data.d/kernel-conf.sh
 exit 0
 fi
+echo 50 > /proc/sys/vm/vfs_cache_pressure
+echo 3 > /proc/sys/net/ipv4/tcp_fastopen
 echo fq > /proc/sys/net/core/default_qdisc 2>/dev/null
 echo 1 > /proc/sys/net/ipv4/tcp_window_scaling 2>/dev/null
 echo "4096 87380 16777216" > /proc/sys/net/ipv4/tcp_rmem 2>/dev/null
