@@ -84,14 +84,12 @@ PATCH4_UFCS=$MODPATH/patch/patch4_ufcs
 
 RMTHERM=$MODPATH/patch/remove_therm
 RMDDRC=$MODPATH/patch/remove_ddrc
-RMDSITIMMING=$MODPATH/patch/remove_dsi_timming
 
 patch_batt_therm=1 # loosen battery‐thermal limits
 patch_pps=1        # enable third‐party 55W PPS
 patch_ufcs=1       # enable UFCS mod
 rm_therm=1         # remove on-chip thermal controls
 rm_ddrc=1          # remove DDRC node(s)
-rm_dsi_timming=1   # remove DSI timing overrides
 
 find_prop_symbols() {
     $lfdtget "$1" /__symbols__ "$2"
@@ -319,10 +317,6 @@ PATCH_DTB() {
 
     if [ "$rm_ddrc" -eq 1 ]; then
         rm_proc_from_file "$RMDDRC" "$dtbfile"
-    fi
-
-    if [ "$rm_dsi_timming" -eq 1 ]; then
-        rm_proc_from_file "$RMDSITIMMING" "$dtbfile"
     fi
 
     namemark "$dtbfile" "$(basename "$dtbfile")"
