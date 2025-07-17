@@ -434,7 +434,7 @@ rm -f /data/adb/service.d/kernel-conf.sh
 rm -f /data/adb/post-fs-data.d/kernel-conf.sh
 exit 0
 fi
-echo 43200000 > /proc/sys/vm/stat_interval
+sysctl -w vm.stat_interval=4320000
 echo 50 > /proc/sys/vm/vfs_cache_pressure
 echo 3 > /proc/sys/net/ipv4/tcp_fastopen
 echo fq > /proc/sys/net/core/default_qdisc 2>/dev/null
