@@ -4,7 +4,7 @@
 ### AnyKernel setup
 # global properties
 properties() { '
-kernel.string=Epicmann24s kernel by epicmann24 @ xda-developers epkmn @ telegram
+kernel.string=Epicmann24s kernel by epicmann24 @ xda-developers Epicmann24 @ telegram
 do.devicecheck=0
 do.modules=0
 do.systemless=0
