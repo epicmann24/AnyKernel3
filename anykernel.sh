@@ -430,6 +430,7 @@ sd
 cat <<'pfsd'>> /data/adb/post-fs-data.d/kernel-conf.sh
 #!/system/bin/sh
 if ! echo $(uname -r) | grep -q "Epicmann24"; then
+rm -rf /data/local/tmp/empty
 rm -f /data/adb/service.d/kernel-conf.sh
 rm -f /data/adb/post-fs-data.d/kernel-conf.sh
 exit 0
@@ -466,7 +467,16 @@ resetprop persist.anr.dumpthr 0
 resetprop persist.sys.enable_adsp_dump 0
 resetprop persist.sys.enable_venus_dump 0
 resetprop persist.sys.oplus.wifi.fulldump.enable 0
+resetprop persist.sys.oplus.cvt.manager false
+resetprop persist.sys.oppo.junkmonitor false
 resetprop persist.vendor.service.bt.iotinfo.report.enable 0
+resetprop persist.sys.tasktracker.enable false
+resetprop persist.vendor.tracing.hsuart.enabled 0
+resetprop persist.traced.enable 0
+resetprop persist.device_config.aconfig_flags.runtime_native_boot.disable_lock_profiling true
+resetprop persist.device_config.runtime_native_boot.disable_lock_profiling true
+resetprop persist.sys.force_sw_gles 0
+resetprop sys.oplus.cvt.enable false
 resetprop sys.wifitracing.started 0
 resetprop sys.trace.traced_started 0
 resetprop sys.oplus.wifi.dump.needupload 0
@@ -476,17 +486,28 @@ resetprop ro.oplus.wifi.minidump.enable.state 0
 resetprop ro.vendor.oplus.modemdump_enable 0
 resetprop ro.logd.flowctrl.on 0
 resetprop ro.logd.flowctrl.method 0
+resetprop ro.oplus.osense.uaf_enable false
+resetprop ro.oplus.osense.uaf_key_thread_enable false
+resetprop ro.oplus.osense.uaf_vip_binder_enable false
+resetprop ro.oplus.audio.thermal_control false
 resetprop debug.oplus.video.log.enable 0
 resetprop debug.sf.oplus_display_trace.enable 0
 resetprop debug.c2.use_dmabufheaps 0
+resetprop debug.egl.hw 1
+resetprop debug.renderengine.backend skiavkthreaded
+resetprop debug.renderengine.vulkan true
+resetprop debug.stagefright.renderengine.backend threaded
 resetprop vendor.swvdec.log.level 0
 resetprop dalvik.vm.dex2oat-minidebuginfo 0
 resetprop dalvik.vm.minidebuginfo 0
+resetprop oplus.dex.tempcontrol false
 
 resetprop ro.oplus.radio.global_regionlock.log 0
 resetprop net.core.default_qdisc fq
 resetprop net.ipv4.tcp_congestion_control bbr
 resetprop ro.boot.veritymode enforcing
+
+mkdir -p /data/local/tmp/empty
 
 mount --bind /data/local/tmp/empty /system_ext/app/CrashBox
 mount --bind /data/local/tmp/empty /system_ext/app/EidService
@@ -508,5 +529,6 @@ mount --bind /data/local/tmp/empty /system_ext/priv-app/xrvdservice
 mount --bind /data/local/tmp/empty /product/app/DeviceStatisticsService
 mount --bind /data/local/tmp/empty /system_ext/app/OwkService
 mount --bind /data/local/tmp/empty /my_stock/non_overlay/app/OBrain
+mount --bind /data/local/tmp/empty /system_ext/app/EidService
 
-psd
+psfd
