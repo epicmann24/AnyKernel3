@@ -438,7 +438,7 @@ fi
 sysctl -w vm.stat_interval=4320000
 echo 50 > /proc/sys/vm/vfs_cache_pressure
 echo 3 > /proc/sys/net/ipv4/tcp_fastopen
-echo fq > /proc/sys/net/core/default_qdisc 2>/dev/null
+echo fq_codel > /proc/sys/net/core/default_qdisc 2>/dev/null
 echo 1 > /proc/sys/net/ipv4/tcp_window_scaling 2>/dev/null
 echo "4096 87380 16777216" > /proc/sys/net/ipv4/tcp_rmem 2>/dev/null
 echo "4096 65536 16777216" > /proc/sys/net/ipv4/tcp_wmem 2>/dev/null
@@ -461,7 +461,7 @@ resetprop persist.sys.ostats_pullerd.enable 0
 resetprop persist.sys.ostatsd.enable 0
 resetprop persist.ims.disableADBLogs 1
 resetprop persist.ims.disableDebugLogs 1
-resetprop persist.ims.disablelMSLogs 1
+resetprop persist.ims.disableIMSLogs 1
 resetprop persist.sys.oplus.bt.switch_log.enable false
 resetprop persist.anr.dumpthr 0
 resetprop persist.sys.enable_adsp_dump 0
@@ -503,7 +503,7 @@ resetprop dalvik.vm.minidebuginfo 0
 resetprop oplus.dex.tempcontrol false
 
 resetprop ro.oplus.radio.global_regionlock.log 0
-resetprop net.core.default_qdisc fq
+resetprop net.core.default_qdisc fq_codel
 resetprop net.ipv4.tcp_congestion_control bbr
 resetprop ro.boot.veritymode enforcing
 
@@ -519,8 +519,8 @@ mount --bind /data/local/tmp/empty /system_ext/app/QCC
 mount --bind /data/local/tmp/empty /system_ext/app/LFEHer
 mount --bind /data/local/tmp/empty /system_ext/app/OplusQualityProtect
 mount --bind /data/local/tmp/empty /system_ext/priv-app/com.qualcomm.location
+mount --bind /data/local/tmp/empty /system_ext/app/QesdkSysService
 mount --bind /data/local/tmp/empty /product/app/StdSP
-mount --bind /data/local/tmp/empty /product/app/LocationProxy
 mount --bind /data/local/tmp/empty /product/priv-app/DCS
 mount --bind /data/local/tmp/empty /product/priv-app/Metis
 mount --bind /data/local/tmp/empty /vendor/app/TxPwrAdmin
@@ -529,6 +529,10 @@ mount --bind /data/local/tmp/empty /system_ext/priv-app/xrvdservice
 mount --bind /data/local/tmp/empty /product/app/DeviceStatisticsService
 mount --bind /data/local/tmp/empty /system_ext/app/OwkService
 mount --bind /data/local/tmp/empty /my_stock/non_overlay/app/OBrain
-mount --bind /data/local/tmp/empty /system_ext/app/EidService
+mount --bind /data/local/tmp/empty /system_ext/app/SoterService
+mount --bind /data/local/tmp/empty /system_ext/app/TTSatelliteAuth
+mount --bind /data/local/tmp/empty /product/app/MCS
+mount --bind /data/local/tmp/empty /product/priv-app/Facebook-installer
+mount --bind /data/local/tmp/empty /product/app/Facebook-appmanager
 
 psfd
