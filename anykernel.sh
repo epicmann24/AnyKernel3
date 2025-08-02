@@ -493,10 +493,6 @@ resetprop ro.oplus.audio.thermal_control false
 resetprop debug.oplus.video.log.enable 0
 resetprop debug.sf.oplus_display_trace.enable 0
 resetprop debug.c2.use_dmabufheaps 0
-resetprop debug.egl.hw 1
-resetprop debug.renderengine.backend skiavkthreaded
-resetprop debug.renderengine.vulkan true
-resetprop debug.stagefright.renderengine.backend threaded
 resetprop vendor.swvdec.log.level 0
 resetprop dalvik.vm.dex2oat-minidebuginfo 0
 resetprop dalvik.vm.minidebuginfo 0
