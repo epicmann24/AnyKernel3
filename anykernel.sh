@@ -413,6 +413,8 @@ stop statsd
 stop criticallog
 stop traced
 stop traced_probes
+stop incidentd
+kill -STOP $(pidof dumpstate)
 kill -STOP $(pidof tombstoned)
 kill -STOP $(pidof logd)
 
@@ -529,5 +531,6 @@ mount --bind /data/local/tmp/empty /system_ext/app/TTSatelliteAuth
 mount --bind /data/local/tmp/empty /product/app/MCS
 mount --bind /data/local/tmp/empty /product/priv-app/Facebook-installer
 mount --bind /data/local/tmp/empty /product/app/Facebook-appmanager
+mount --bind /data/local/tmp/empty /system/app/Traceur
 
 psfd
