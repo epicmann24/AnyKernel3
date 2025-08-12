@@ -416,7 +416,9 @@ stop traced_probes
 stop incidentd
 kill -STOP $(pidof dumpstate)
 kill -STOP $(pidof tombstoned)
-kill -STOP $(pidof logd)
+
+# You may uncomment the following line to acheive better performance/battery, but a small ammount of annoying bank apps may refuse to run
+#kill -STOP $(pidof logd)
 
 echo "0 25000" >/proc/shell-temp
 echo "1 25000" >/proc/shell-temp
