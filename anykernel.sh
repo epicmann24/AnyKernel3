@@ -441,7 +441,6 @@ exit 0
 fi
 sysctl -w vm.stat_interval=4320000
 echo 3 > /proc/sys/net/ipv4/tcp_fastopen
-echo fq_codel > /proc/sys/net/core/default_qdisc 2>/dev/null
 echo 1 > /proc/sys/net/ipv4/tcp_window_scaling 2>/dev/null
 echo "4096 87380 16777216" > /proc/sys/net/ipv4/tcp_rmem 2>/dev/null
 echo "4096 65536 16777216" > /proc/sys/net/ipv4/tcp_wmem 2>/dev/null
@@ -502,8 +501,6 @@ resetprop dalvik.vm.minidebuginfo 0
 resetprop oplus.dex.tempcontrol false
 
 resetprop ro.oplus.radio.global_regionlock.log 0
-resetprop net.core.default_qdisc fq_codel
-resetprop net.ipv4.tcp_congestion_control bbr
 resetprop ro.boot.veritymode enforcing
 
 mkdir -p /data/local/tmp/empty
