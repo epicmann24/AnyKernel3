@@ -448,7 +448,6 @@ echo 16777216 > /proc/sys/net/core/rmem_max 2>/dev/null
 echo 16777216 > /proc/sys/net/core/wmem_max 2>/dev/null
 echo 4096 > /proc/sys/net/ipv4/tcp_max_syn_backlog 2>/dev/null
 echo 1 > /proc/sys/net/ipv4/tcp_mtu_probing 2>/dev/null
-echo 1 > /proc/sys/net/ipv6/tcp_ecn 2>/dev/null
 echo "4096 87380 16777216" > /proc/sys/net/ipv6/tcp_rmem 2>/dev/null
 echo "4096 65536 16777216" > /proc/sys/net/ipv6/tcp_wmem 2>/dev/null
 resetprop persist.logd.flowctrl.on 0
