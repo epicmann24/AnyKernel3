@@ -101,6 +101,11 @@ echo 9100 > /sys/class/oplus_chg/battery/bcc_current
 chmod 0444 /sys/class/oplus_chg/battery/bcc_current
 chmod 0444 /sys/class/oplus_chg/battery/normal_cool_down
 chmod 0444 /sys/class/oplus_chg/battery/cool_down
+
+echo "1" > /sys/class/devcoredump/disabled
+echo "75" > /dev/cpuctl/foreground/cpu.uclamp.max
+echo "10" > /dev/cpuctl/background/cpu.uclamp.max
+echo "45" > /dev/cpuctl/system-background/cpu.uclamp.max
 sd
 
 cat <<'pfsd'>> /data/adb/post-fs-data.d/kernel-conf.sh
@@ -111,7 +116,6 @@ rm -f /data/adb/service.d/kernel-conf.sh
 rm -f /data/adb/post-fs-data.d/kernel-conf.sh
 exit 0
 fi
-sysctl -w vm.stat_interval=4320000
 echo 1 > /proc/sys/net/ipv4/tcp_window_scaling 2>/dev/null
 echo "4096 87380 16777216" > /proc/sys/net/ipv4/tcp_rmem 2>/dev/null
 echo "4096 65536 16777216" > /proc/sys/net/ipv4/tcp_wmem 2>/dev/null
@@ -121,6 +125,8 @@ echo 4096 > /proc/sys/net/ipv4/tcp_max_syn_backlog 2>/dev/null
 echo 1 > /proc/sys/net/ipv4/tcp_mtu_probing 2>/dev/null
 echo "4096 87380 16777216" > /proc/sys/net/ipv6/tcp_rmem 2>/dev/null
 echo "4096 65536 16777216" > /proc/sys/net/ipv6/tcp_wmem 2>/dev/null
+echo "5000" > /sys/kernel/mm/lru_gen/min_ttl_ms
+echo "0" > /proc/sys/vm/oom_dump_tasks
 resetprop persist.logd.flowctrl.on 0
 resetprop persist.logd.flowctrl.method 0
 resetprop persist.ims.disableQXDMLogs 1
