@@ -89,7 +89,7 @@ stop incidentd
 kill -STOP $(pidof dumpstate)
 kill -STOP $(pidof tombstoned)
 
-# You may uncomment the following line to acheive better performance/battery, but a small ammount of annoying bank apps may refuse to run
+# You may uncomment the following line to acheive borderline better performance/battery, but a few annoying banking apps may refuse to run.
 #kill -STOP $(pidof logd)
 
 echo "0 25000" >/proc/shell-temp
@@ -103,9 +103,13 @@ chmod 0444 /sys/class/oplus_chg/battery/normal_cool_down
 chmod 0444 /sys/class/oplus_chg/battery/cool_down
 
 echo "1" > /sys/class/devcoredump/disabled
-echo "75" > /dev/cpuctl/foreground/cpu.uclamp.max
-echo "10" > /dev/cpuctl/background/cpu.uclamp.max
-echo "45" > /dev/cpuctl/system-background/cpu.uclamp.max
+
+echo "98" > /sys/devices/system/cpu/cpufreq/policy0/walt/hispeed_load
+echo "384000" > /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_min_freq
+echo "95" > /sys/devices/system/cpu/cpufreq/policy6/walt/hispeed_load
+echo "1017600" > /sys/devices/system/cpu/cpufreq/policy6/cpuinfo_min_freq
+
+
 sd
 
 cat <<'pfsd'>> /data/adb/post-fs-data.d/kernel-conf.sh
